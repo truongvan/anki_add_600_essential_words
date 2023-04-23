@@ -1,37 +1,46 @@
-from aqt.qt import *
-from collections import defaultdict
+from aqt.qt import (
+    QDialog,
+    Qt,
+    QVBoxLayout,
+    QLabel,
+    QGridLayout,
+    QLineEdit,
+    QDialogButtonBox,
+)
 
 
 def new_word_dialog(mw):
-    d = QDialog(mw)
-    d.setWindowTitle("Pull from Duolingo")
-    d.setWindowModality(Qt.WindowModal)
+    dialog = QDialog(mw)
+    dialog.setWindowTitle("Pull from Duolingo")
+    dialog.setWindowModality(Qt.WindowModality.WindowModal)
     vbox = QVBoxLayout()
-    l = QLabel("""<p>Please enter your <strong>Word</strong>.</p>""")
-    l.setOpenExternalLinks(True)
-    l.setWordWrap(True)
-    vbox.addWidget(l)
+    label = QLabel("""<p>Please enter your <strong>Word</strong>.</p>""")
+    label.setOpenExternalLinks(True)
+    label.setWordWrap(True)
+    vbox.addWidget(label)
     vbox.addSpacing(20)
-    g = QGridLayout()
+    grid_layout = QGridLayout()
     field_labels = {}
     field_keys = ("Word", "Parts_of_speech", "Meaning", "Example")
     for _i, field_name in enumerate(field_keys):
-        label = QLabel(_(f"{field_name}:"))
-        g.addWidget(label, _i, 0)
+        label = QLabel(f"{field_name}:")
+        grid_layout.addWidget(label, _i, 0)
         field_labels[field_name] = QLineEdit()
-        g.addWidget(field_labels[field_name], _i, 1)
+        grid_layout.addWidget(field_labels[field_name], _i, 1)
 
-    vbox.addLayout(g)
-    bb = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-    bb.button(QDialogButtonBox.Ok).setAutoDefault(True)
-    bb.accepted.connect(d.accept)
-    bb.rejected.connect(d.reject)
-    vbox.addWidget(bb)
-    d.setLayout(vbox)
-    d.show()
-    accepted = d.exec_()
+    vbox.addLayout(grid_layout)
+    button_box = QDialogButtonBox(
+        QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+    )
+    button_box.button(QDialogButtonBox.StandardButton.Ok).setAutoDefault(True)
+    button_box.accepted.connect(dialog.accept)
+    button_box.rejected.connect(dialog.reject)
+    vbox.addWidget(button_box)
+    dialog.setLayout(vbox)
+    dialog.show()
+    accepted = dialog.exec()
 
-    field_data = { k: fl.text() for k, fl in field_labels.items() }
+    field_data = {k: fl.text() for k, fl in field_labels.items()}
 
     if accepted:
         return field_data
